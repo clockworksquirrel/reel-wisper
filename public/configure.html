@@ -769,21 +769,24 @@
             <p>GPT-4o, GPT-4o-mini, and the full OpenAI model lineup.</p>
           </div>
 
-          <div class="backend-card" data-backend="custom" onclick="selectBackend('custom')">
+          <div class="backend-card" data-backend="claude" onclick="selectBackend('claude')">
             <div class="bg-number">03</div>
+            <div class="card-icon">
+              <span class="material-symbols-outlined">emoji_objects</span>
+              <span class="active-badge">Active</span>
+            </div>
+            <h3>Claude</h3>
+            <p>Anthropic's Claude — Haiku 4.5 for speed, Sonnet 4.6 for depth.</p>
+          </div>
+
+          <div class="backend-card" data-backend="custom" onclick="selectBackend('custom')">
+            <div class="bg-number">04</div>
             <div class="card-icon">
               <span class="material-symbols-outlined">tune</span>
               <span class="active-badge">Active</span>
             </div>
             <h3>Custom</h3>
             <p>Any OpenAI-compatible endpoint — OpenRouter, Ollama, LM Studio, etc.</p>
-          </div>
-
-          <div class="backend-card placeholder" style="cursor: default; opacity: 0.4;">
-            <div style="text-align: center; padding: 1rem 0;">
-              <div style="width: 2rem; height: 1px; background: rgba(68,71,72,0.5); margin: 0 auto 0.75rem;"></div>
-              <p style="font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--outline-variant);">More coming...</p>
-            </div>
           </div>
         </div>
       </div>
@@ -814,7 +817,11 @@
       <div class="field-group">
         <label>Model</label>
         <div class="input-wrapper">
-          <input type="text" id="model" value="gemini-3.1-flash-lite-preview" placeholder="gemini-3.1-flash-lite-preview"/>
+          <select id="modelSelect" onchange="updateModel()">
+          </select>
+        </div>
+        <div class="input-wrapper" id="modelCustomWrapper" style="display: none; margin-top: 0.5rem;">
+          <input type="text" id="modelCustom" placeholder="Enter model ID"/>
         </div>
         <p class="field-hint" id="modelHint">Gemini 3.1 Flash Lite — fast, free, and accurate</p>
       </div>
@@ -907,30 +914,59 @@
   const presets = {
     gemini: {
       baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
-      model: 'gemini-3.1-flash-lite-preview',
       placeholder: 'AIzaSy...',
       baseUrlHint: 'Google AI Studio endpoint',
-      modelHint: 'Gemini 3.1 Flash Lite — fast, free, and accurate',
       showBaseUrl: false,
       keyUrl: 'https://aistudio.google.com/apikey',
+      models: [
+        { id: 'gemini-3.1-flash-lite-preview', name: 'Gemini 3.1 Flash Lite (Recommended)', hint: 'Fast, free, and accurate' },
+        { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash', hint: 'Previous gen flash — solid and free' },
+        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', hint: 'Stable, well-tested' },
+        { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite', hint: 'Ultra lightweight, very fast' },
+        { id: 'gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro', hint: 'Most capable — slower, may cost' },
+        { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro', hint: 'Previous gen pro' },
+        { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', hint: 'Stable pro model' },
+        { id: '_custom', name: 'Custom...', hint: 'Enter any Gemini model ID' },
+      ],
     },
     openai: {
       baseUrl: 'https://api.openai.com/v1',
-      model: 'gpt-4o-mini',
       placeholder: 'sk-...',
       baseUrlHint: 'OpenAI API endpoint',
-      modelHint: 'Any OpenAI model — gpt-4o, gpt-4o-mini, o4-mini, etc.',
       showBaseUrl: false,
       keyUrl: 'https://platform.openai.com/api-keys',
+      models: [
+        { id: 'gpt-5.4-mini', name: 'GPT-5.4 Mini (Recommended)', hint: 'Fast & cheap — great for search' },
+        { id: 'gpt-5.4-nano', name: 'GPT-5.4 Nano', hint: 'Fastest, cheapest' },
+        { id: 'gpt-5.4', name: 'GPT-5.4', hint: 'Most capable — slower, more expensive' },
+        { id: 'gpt-4o-mini', name: 'GPT-4o Mini', hint: 'Previous gen mini — still works' },
+        { id: 'gpt-4o', name: 'GPT-4o', hint: 'Previous gen flagship' },
+        { id: '_custom', name: 'Custom...', hint: 'Enter any OpenAI model ID' },
+      ],
+    },
+    claude: {
+      baseUrl: 'https://api.anthropic.com/v1/',
+      placeholder: 'sk-ant-...',
+      baseUrlHint: 'Anthropic API (OpenAI-compatible)',
+      showBaseUrl: false,
+      keyUrl: 'https://console.anthropic.com/settings/keys',
+      models: [
+        { id: 'claude-haiku-4-5', name: 'Claude Haiku 4.5 (Recommended)', hint: 'Fastest & cheapest — $1/$5 per MTok' },
+        { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6', hint: 'More capable — $3/$15 per MTok' },
+        { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5', hint: 'Previous gen Sonnet' },
+        { id: 'claude-opus-4-6', name: 'Claude Opus 4.6', hint: 'Most capable — expensive' },
+        { id: '_custom', name: 'Custom...', hint: 'Enter any Claude model ID' },
+      ],
     },
     custom: {
       baseUrl: '',
-      model: '',
       placeholder: 'Your API key or auth token',
       baseUrlHint: 'Any OpenAI-compatible endpoint (OpenRouter, Ollama, etc.)',
-      modelHint: 'Any model your backend supports',
       showBaseUrl: true,
       keyUrl: null,
+      models: [
+        { id: '_custom', name: 'Custom...', hint: 'Enter the model ID your backend supports' },
+      ],
     },
   };
 
@@ -946,11 +982,20 @@
 
     // Update fields
     document.getElementById('baseUrl').value = p.baseUrl;
-    document.getElementById('model').value = p.model;
     document.getElementById('apiKey').placeholder = p.placeholder;
     document.getElementById('baseUrlHint').textContent = p.baseUrlHint;
-    document.getElementById('modelHint').textContent = p.modelHint;
     document.getElementById('baseUrlField').style.display = p.showBaseUrl ? '' : 'none';
+
+    // Populate model dropdown
+    const modelSelect = document.getElementById('modelSelect');
+    modelSelect.innerHTML = '';
+    for (const m of p.models) {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.name;
+      modelSelect.appendChild(opt);
+    }
+    updateModel();
 
     // Update key icon state
     const keyIcon = document.getElementById('keyIcon');
@@ -963,6 +1008,30 @@
       keyIcon.style.cursor = 'default';
       keyIcon.title = '';
     }
+  }
+
+  /* ─── Model selection ────────────────────────────────────────────────────── */
+  function updateModel() {
+    const modelSelect = document.getElementById('modelSelect');
+    const modelCustomWrapper = document.getElementById('modelCustomWrapper');
+    const p = presets[currentBackend];
+    const selected = p.models.find(m => m.id === modelSelect.value);
+
+    if (modelSelect.value === '_custom') {
+      modelCustomWrapper.style.display = '';
+    } else {
+      modelCustomWrapper.style.display = 'none';
+    }
+
+    document.getElementById('modelHint').textContent = selected?.hint || '';
+  }
+
+  function getModel() {
+    const modelSelect = document.getElementById('modelSelect');
+    if (modelSelect.value === '_custom') {
+      return document.getElementById('modelCustom').value.trim();
+    }
+    return modelSelect.value;
   }
 
   /* ─── Password toggle ───────────────────────────────────────────────── */
@@ -992,11 +1061,18 @@
       return;
     }
 
+    const model = getModel();
+    if (!model) {
+      errorEl.textContent = 'Please select or enter a model name.';
+      errorEl.classList.add('visible');
+      return;
+    }
+
     const body = {
       backend: currentBackend,
       apiKey,
       baseUrl: document.getElementById('baseUrl').value.trim() || presets[currentBackend].baseUrl,
-      model: document.getElementById('model').value.trim(),
+      model,
     };
 
     try {
@@ -1048,9 +1124,13 @@
   function resetForm() {
     selectBackend('gemini');
     document.getElementById('apiKey').value = '';
+    document.getElementById('modelCustom').value = '';
     document.getElementById('result').classList.remove('visible');
     document.getElementById('error').classList.remove('visible');
   }
+
+  // Initialize on load
+  selectBackend('gemini');
 </script>
 </body>
 </html>
