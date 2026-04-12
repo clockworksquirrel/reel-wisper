@@ -1,14 +1,18 @@
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const BASE = 'https://api.themoviedb.org/3';
 const IMG_BASE = 'https://image.tmdb.org/t/p';
+
+function getApiKey() {
+  return process.env.TMDB_API_KEY;
+}
 
 /**
  * Search TMDB for a movie by title (and optional year).
  * Returns the best match or null.
  */
 export async function searchMovie(title, year) {
+  if (!getApiKey()) throw new Error('TMDB_API_KEY not set');
   const params = new URLSearchParams({
-    api_key: TMDB_API_KEY,
+    api_key: getApiKey(),
     query: title,
     include_adult: 'false',
   });
@@ -25,8 +29,9 @@ export async function searchMovie(title, year) {
  * Returns the best match or null.
  */
 export async function searchTV(title, year) {
+  if (!getApiKey()) throw new Error('TMDB_API_KEY not set');
   const params = new URLSearchParams({
-    api_key: TMDB_API_KEY,
+    api_key: getApiKey(),
     query: title,
     include_adult: 'false',
   });
@@ -42,7 +47,7 @@ export async function searchTV(title, year) {
  * Get external IDs (including IMDB ID) for a TMDB movie.
  */
 export async function getMovieExternalIds(tmdbId) {
-  const res = await fetch(`${BASE}/movie/${tmdbId}/external_ids?api_key=${TMDB_API_KEY}`);
+  const res = await fetch(`${BASE}/movie/${tmdbId}/external_ids?api_key=${getApiKey()}`);
   if (!res.ok) return {};
   return res.json();
 }
@@ -51,7 +56,7 @@ export async function getMovieExternalIds(tmdbId) {
  * Get external IDs for a TMDB TV series.
  */
 export async function getTVExternalIds(tmdbId) {
-  const res = await fetch(`${BASE}/tv/${tmdbId}/external_ids?api_key=${TMDB_API_KEY}`);
+  const res = await fetch(`${BASE}/tv/${tmdbId}/external_ids?api_key=${getApiKey()}`);
   if (!res.ok) return {};
   return res.json();
 }
@@ -60,7 +65,7 @@ export async function getTVExternalIds(tmdbId) {
  * Get full movie details from TMDB.
  */
 export async function getMovieDetails(tmdbId) {
-  const res = await fetch(`${BASE}/movie/${tmdbId}?api_key=${TMDB_API_KEY}&append_to_response=external_ids`);
+  const res = await fetch(`${BASE}/movie/${tmdbId}?api_key=${getApiKey()}&append_to_response=external_ids`);
   if (!res.ok) return null;
   return res.json();
 }
@@ -69,7 +74,7 @@ export async function getMovieDetails(tmdbId) {
  * Get full TV series details from TMDB.
  */
 export async function getTVDetails(tmdbId) {
-  const res = await fetch(`${BASE}/tv/${tmdbId}?api_key=${TMDB_API_KEY}&append_to_response=external_ids`);
+  const res = await fetch(`${BASE}/tv/${tmdbId}?api_key=${getApiKey()}&append_to_response=external_ids`);
   if (!res.ok) return null;
   return res.json();
 }
@@ -114,6 +119,43 @@ export function tvToMeta(show, externalIds) {
     imdbRating: show.vote_average ? String(Math.round(show.vote_average * 10) / 10) : undefined,
     genres: show.genre_ids ? undefined : show.genres?.map(g => g.name),
   };
+}
+
+/**
+ * Multi-search TMDB (movies, TV, people).
+ */
+export async function multiSearch(query) {
+  if (!getApiKey()) throw new Error('TMDB_API_KEY not set');
+  const params = new URLSearchParams({
+    api_key: getApiKey(),
+    query,
+    include_adult: 'false',
+  });
+  const res = await fetch(`${BASE}/search/multi?${params}`);
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.results || [];
+}
+
+/**
+ * Get a person's combined credits (cast) from TMDB.
+ * Returns separate arrays for movies and TV, sorted by popularity.
+ */
+export async function getPersonCredits(personId) {
+  if (!getApiKey()) throw new Error('TMDB_API_KEY not set');
+  const res = await fetch(`${BASE}/person/${personId}/combined_credits?api_key=${getApiKey()}`);
+  if (!res.ok) return { movies: [], tv: [] };
+  const data = await res.json();
+  const cast = data.cast || [];
+  const movies = cast
+    .filter(c => c.media_type === 'movie')
+    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+    .slice(0, 20);
+  const tv = cast
+    .filter(c => c.media_type === 'tv')
+    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+    .slice(0, 20);
+  return { movies, tv };
 }
 
 /**

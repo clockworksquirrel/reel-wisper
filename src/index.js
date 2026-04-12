@@ -53,6 +53,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// ─── Health / Diagnostics ────────────────────────────────────────────────────
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    env: {
+      TMDB_API_KEY: process.env.TMDB_API_KEY ? 'set' : 'MISSING',
+      TVDB_API_KEY: process.env.TVDB_API_KEY ? 'set' : 'MISSING',
+      CONFIG_SECRET: process.env.CONFIG_SECRET ? 'set' : 'MISSING (using default)',
+      PORT: process.env.PORT || '4000',
+    },
+  });
+});
+
 // ─── Configure Page ──────────────────────────────────────────────────────────
 
 app.get('/', (req, res) => {

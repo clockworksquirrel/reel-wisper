@@ -1,4 +1,6 @@
-const TVDB_API_KEY = process.env.TVDB_API_KEY;
+function getTvdbApiKey() {
+  return process.env.TVDB_API_KEY;
+}
 const BASE = 'https://api4.thetvdb.com/v4';
 
 let cachedToken = null;
@@ -13,7 +15,7 @@ async function getToken() {
   const res = await fetch(`${BASE}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ apikey: TVDB_API_KEY }),
+    body: JSON.stringify({ apikey: getTvdbApiKey() }),
   });
   if (!res.ok) throw new Error(`TVDB login failed: ${res.status}`);
   const data = await res.json();
