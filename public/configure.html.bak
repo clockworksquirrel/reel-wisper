@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReeL Wisper — Configure</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #888;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: #141420;
+      border: 1px solid #1e1e30;
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .field {
+      margin-bottom: 1.5rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .field select, .field input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #0d0d18;
+      border: 1px solid #2a2a40;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field select:focus, .field input:focus {
+      border-color: #a78bfa;
+    }
+
+    .field .hint {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 0.35rem;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .result {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      background: #0d1117;
+      border: 1px solid #1e3a2f;
+      border-radius: 8px;
+    }
+
+    .result.visible { display: block; }
+
+    .result h3 {
+      font-size: 0.85rem;
+      color: #6ee7b7;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .result .url-box {
+      background: #0a0a0f;
+      border: 1px solid #2a2a40;
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.8rem;
+      word-break: break-all;
+      color: #a78bfa;
+      margin-bottom: 0.75rem;
+    }
+
+    .result .actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .result .actions button {
+      flex: 1;
+      padding: 0.6rem;
+      border-radius: 6px;
+      border: 1px solid #2a2a40;
+      background: #141420;
+      color: #e0e0e0;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .result .actions button:hover { background: #1e1e30; }
+
+    .result .actions .install-btn {
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      border: none;
+      color: white;
+      font-weight: 600;
+    }
+
+    .error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: #444;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>ReeL Wisper</h1>
+      <p>AI-powered movie & TV discovery for Stremio.<br>Describe what you want to watch. We'll find it.</p>
+    </div>
+
+    <div class="card">
+      <div class="field">
+        <label>Provider</label>
+        <select id="backend" onchange="updateFields()">
+          <option value="openai">OpenAI</option>
+          <option value="gemini">Google Gemini</option>
+          <option value="openrouter">OpenRouter</option>
+          <option value="custom">Custom (OpenAI-compatible)</option>
+        </select>
+      </div>
+
+      <div class="field" id="baseUrlField" style="display: none;">
+        <label>API Base URL</label>
+        <input type="url" id="baseUrl" value="https://api.openai.com/v1" placeholder="https://api.openai.com/v1">
+        <div class="hint">Any OpenAI-compatible API endpoint</div>
+      </div>
+
+      <div class="field">
+        <label>API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-...">
+        <div class="hint" id="apiKeyHint">Get one at platform.openai.com/api-keys</div>
+      </div>
+
+      <div class="field">
+        <label>Model</label>
+        <select id="modelSelect" onchange="updateModel()">
+        </select>
+        <input type="text" id="modelCustom" style="display:none; margin-top: 0.5rem;" placeholder="Enter model ID">
+        <div class="hint" id="modelHint">Fast & cheap, great for search</div>
+      </div>
+
+      <button class="btn" onclick="generate()">Generate Addon URL</button>
+      <div class="error" id="error"></div>
+
+      <div class="result" id="result">
+        <h3>Your Addon URL</h3>
+        <div class="url-box" id="manifestUrl"></div>
+        <div class="actions">
+          <button onclick="copyUrl()">Copy URL</button>
+          <button class="install-btn" onclick="installAddon()">Install in Stremio</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      ReeL Wisper — Your API keys are encrypted in the URL and never stored on our servers.
+    </div>
+  </div>
+
+  <script>
+    let currentManifestUrl = '';
+    let currentStremioUrl = '';
+
+    const providers = {
+      openai: {
+        baseUrl: 'https://api.openai.com/v1',
+        keyHint: 'Get one at platform.openai.com/api-keys',
+        keyPlaceholder: 'sk-...',
+        models: [
+          { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Recommended)', hint: 'Fast & cheap, great for search' },
+          { id: 'gpt-4o', name: 'GPT-4o', hint: 'More capable, slightly slower' },
+          { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', hint: 'Latest mini model' },
+          { id: 'gpt-4.1-nano', name: 'GPT-4.1 Nano', hint: 'Fastest, cheapest' },
+          { id: 'custom', name: 'Custom...', hint: 'Enter any model ID' },
+        ],
+      },
+      gemini: {
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
+        keyHint: 'Get one at aistudio.google.com/apikey (free tier available)',
+        keyPlaceholder: 'AIza...',
+        models: [
+          { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash (Recommended)', hint: 'Fast, free tier available' },
+          { id: 'gemini-2.5-flash-preview-04-17', name: 'Gemini 2.5 Flash', hint: 'Latest flash model' },
+          { id: 'gemini-2.5-pro-preview-03-25', name: 'Gemini 2.5 Pro', hint: 'Most capable' },
+          { id: 'custom', name: 'Custom...', hint: 'Enter any model ID' },
+        ],
+      },
+      openrouter: {
+        baseUrl: 'https://openrouter.ai/api/v1',
+        keyHint: 'Get one at openrouter.ai/keys',
+        keyPlaceholder: 'sk-or-...',
+        models: [
+          { id: 'google/gemini-2.0-flash-001', name: 'Gemini 2.0 Flash (Recommended)', hint: 'Free on OpenRouter' },
+          { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini', hint: 'Fast & cheap' },
+          { id: 'anthropic/claude-3.5-haiku', name: 'Claude 3.5 Haiku', hint: 'Fast Anthropic model' },
+          { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B', hint: 'Free on OpenRouter' },
+          { id: 'custom', name: 'Custom...', hint: 'Enter any model ID' },
+        ],
+      },
+      custom: {
+        baseUrl: '',
+        keyHint: 'Your API key or auth token',
+        keyPlaceholder: 'your-api-key',
+        models: [
+          { id: 'custom', name: 'Custom...', hint: 'Enter the model ID your backend supports' },
+        ],
+      },
+    };
+
+    function updateFields() {
+      const backend = document.getElementById('backend').value;
+      const provider = providers[backend];
+      const baseUrlField = document.getElementById('baseUrlField');
+      const baseUrlInput = document.getElementById('baseUrl');
+
+      // Show base URL field only for custom
+      baseUrlField.style.display = backend === 'custom' ? 'block' : 'none';
+      baseUrlInput.value = provider.baseUrl;
+
+      // Update key hint
+      document.getElementById('apiKeyHint').textContent = provider.keyHint;
+      document.getElementById('apiKey').placeholder = provider.keyPlaceholder;
+
+      // Update model dropdown
+      const modelSelect = document.getElementById('modelSelect');
+      modelSelect.innerHTML = '';
+      for (const m of provider.models) {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.name;
+        modelSelect.appendChild(opt);
+      }
+
+      updateModel();
+    }
+
+    function updateModel() {
+      const modelSelect = document.getElementById('modelSelect');
+      const modelCustom = document.getElementById('modelCustom');
+      const backend = document.getElementById('backend').value;
+      const provider = providers[backend];
+
+      if (modelSelect.value === 'custom') {
+        modelCustom.style.display = 'block';
+      } else {
+        modelCustom.style.display = 'none';
+      }
+
+      const selected = provider.models.find(m => m.id === modelSelect.value);
+      document.getElementById('modelHint').textContent = selected?.hint || '';
+    }
+
+    function getModel() {
+      const modelSelect = document.getElementById('modelSelect');
+      if (modelSelect.value === 'custom') {
+        return document.getElementById('modelCustom').value.trim();
+      }
+      return modelSelect.value;
+    }
+
+    async function generate() {
+      const errorEl = document.getElementById('error');
+      const resultEl = document.getElementById('result');
+      errorEl.style.display = 'none';
+      resultEl.classList.remove('visible');
+
+      const apiKey = document.getElementById('apiKey').value.trim();
+      if (!apiKey) {
+        errorEl.textContent = 'API key is required';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const model = getModel();
+      if (!model) {
+        errorEl.textContent = 'Please enter a model name';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const backend = document.getElementById('backend').value;
+      const baseUrl = backend === 'custom'
+        ? document.getElementById('baseUrl').value.trim()
+        : providers[backend].baseUrl;
+
+      const body = { backend, apiKey, baseUrl, model };
+
+      try {
+        const res = await fetch('/configure', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        currentManifestUrl = data.manifestUrl;
+        currentStremioUrl = data.stremioUrl;
+        document.getElementById('manifestUrl').textContent = currentManifestUrl;
+        resultEl.classList.add('visible');
+      } catch (e) {
+        errorEl.textContent = e.message;
+        errorEl.style.display = 'block';
+      }
+    }
+
+    function copyUrl() {
+      navigator.clipboard.writeText(currentManifestUrl);
+    }
+
+    function installAddon() {
+      window.location.href = currentStremioUrl;
+    }
+
+    // Initialize on load
+    updateFields();
+  </script>
+</body>
+</html>

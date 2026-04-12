@@ -1,393 +1,1056 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ReeL Wisper — Configure</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ReeL Wisper — Configure</title>
+<meta name="description" content="AI-powered natural language movie & TV discovery. Describe what you want to watch and let AI find it."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200;300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+  /* ─── Design System: The Projected Narrative ─────────────────────────── */
+  :root {
+    --surface:                  #131313;
+    --surface-dim:              #131313;
+    --surface-bright:           #393939;
+    --surface-container-lowest: #0e0e0e;
+    --surface-container-low:    #1c1b1b;
+    --surface-container:        #201f1f;
+    --surface-container-high:   #2a2a2a;
+    --surface-container-highest:#353534;
+    --surface-variant:          #353534;
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0a0a0f;
-      color: #e0e0e0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
+    --primary:                  #e1c198;
+    --primary-container:        #271700;
+    --primary-fixed:            #ffddb2;
+    --primary-fixed-dim:        #e1c198;
+    --on-primary:               #402d0f;
+    --on-primary-container:     #9a7e5a;
+    --on-primary-fixed:         #291800;
+
+    --secondary:                #bec6dc;
+    --secondary-container:      #3e4759;
+    --on-secondary:             #283141;
+    --on-secondary-container:   #acb5ca;
+
+    --tertiary:                 #ffb3af;
+    --tertiary-container:       #3e0005;
+    --on-tertiary:              #601216;
+    --on-tertiary-container:    #cb6361;
+
+    --on-surface:               #e5e2e1;
+    --on-surface-variant:       #c4c7c7;
+    --on-background:            #e5e2e1;
+    --background:               #131313;
+
+    --outline:                  #8e9192;
+    --outline-variant:          #444748;
+
+    --error:                    #ffb4ab;
+    --error-container:          #93000a;
+    --on-error:                 #690005;
+    --on-error-container:       #ffdad6;
+
+    --inverse-surface:          #e5e2e1;
+    --inverse-on-surface:       #313030;
+    --inverse-primary:          #735a39;
+    --surface-tint:             #e1c198;
+
+    /* Typography */
+    --font-headline: 'Noto Serif', Georgia, serif;
+    --font-body:     'Manrope', system-ui, sans-serif;
+
+    /* Radius — structured, not playful */
+    --radius-sm: 0.125rem;
+    --radius-md: 0.375rem;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--surface);
+    color: var(--on-surface);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Film grain overlay — signature texture */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  }
+
+  /* ─── Header ─────────────────────────────────────────────────────────── */
+  header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 50;
+    height: 5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    background: linear-gradient(to bottom, var(--surface-container-low), transparent);
+    box-shadow: 0 20px 50px rgba(225, 193, 152, 0.04);
+  }
+
+  .logo {
+    font-family: var(--font-headline);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--primary);
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .logo span {
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  header nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  header nav a {
+    font-family: var(--font-headline);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--outline);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  header nav a:hover { color: var(--on-surface); }
+
+  /* ─── Main ───────────────────────────────────────────────────────────── */
+  main {
+    flex-grow: 1;
+    padding: 8rem 1.5rem 6rem;
+    max-width: 72rem;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 4rem;
+  }
+
+  .hero .overline {
+    font-family: var(--font-body);
+    font-size: 0.625rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(225, 193, 152, 0.6);
+    margin-bottom: 0.5rem;
+  }
+
+  .hero h1 {
+    font-family: var(--font-headline);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    max-width: 40rem;
+  }
+
+  .hero h1 em {
+    color: var(--primary);
+    font-style: italic;
+  }
+
+  .hero .tagline {
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--outline);
+    max-width: 36rem;
+    line-height: 1.7;
+  }
+
+  /* ─── Grid layout ────────────────────────────────────────────────────── */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  @media (min-width: 64rem) {
+    .layout {
+      grid-template-columns: 7fr 5fr;
     }
+  }
 
-    .container {
-      max-width: 520px;
-      width: 100%;
-    }
+  /* ─── Form section ───────────────────────────────────────────────────── */
+  .config-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
 
-    .header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
 
-    .header h1 {
-      font-size: 2.4rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #a78bfa, #60a5fa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 0.5rem;
-    }
+  .field-group label {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--outline);
+  }
 
-    .header p {
-      color: #888;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
+  .input-wrapper {
+    position: relative;
+  }
 
-    .card {
-      background: #141420;
-      border: 1px solid #1e1e30;
-      border-radius: 12px;
-      padding: 2rem;
-    }
+  .input-wrapper input,
+  .input-wrapper select {
+    width: 100%;
+    background: var(--surface-container-low);
+    border: none;
+    border-bottom: 1px solid rgba(68, 71, 72, 0.3);
+    color: var(--on-surface);
+    font-family: var(--font-headline);
+    font-size: 1.1rem;
+    padding: 1.25rem 3.5rem 1.25rem 1rem;
+    outline: none;
+    transition: all 0.4s;
+    border-radius: var(--radius-sm);
+    -webkit-appearance: none;
+    appearance: none;
+  }
 
-    .field {
-      margin-bottom: 1.5rem;
-    }
+  .input-wrapper input::placeholder {
+    color: var(--surface-container-highest);
+  }
 
-    .field label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #aaa;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
-    }
+  .input-wrapper input:focus,
+  .input-wrapper select:focus {
+    border-bottom-color: var(--primary);
+    background: rgba(32, 31, 31, 0.5);
+    box-shadow: 0 4px 30px rgba(225, 193, 152, 0.06);
+  }
 
-    .field select, .field input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      background: #0d0d18;
-      border: 1px solid #2a2a40;
-      border-radius: 8px;
-      color: #e0e0e0;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+  .input-wrapper select {
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 1.25rem 1rem;
+  }
 
-    .field select:focus, .field input:focus {
-      border-color: #a78bfa;
-    }
+  .input-wrapper select option {
+    background: var(--surface-container);
+    color: var(--on-surface);
+  }
 
-    .field .hint {
-      font-size: 0.8rem;
-      color: #666;
-      margin-top: 0.35rem;
-    }
+  .input-wrapper .trailing-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--outline);
+    display: flex;
+    gap: 1rem;
+    transition: color 0.3s;
+  }
 
-    .btn {
-      width: 100%;
-      padding: 0.85rem;
-      background: linear-gradient(135deg, #7c3aed, #3b82f6);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
+  .input-wrapper input:focus ~ .trailing-icon {
+    color: var(--primary);
+  }
 
-    .btn:hover { opacity: 0.9; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .trailing-icon .material-symbols-outlined {
+    cursor: pointer;
+    transition: color 0.2s;
+  }
 
-    .result {
-      display: none;
-      margin-top: 1.5rem;
-      padding: 1.25rem;
-      background: #0d1117;
-      border: 1px solid #1e3a2f;
-      border-radius: 8px;
-    }
+  .trailing-icon .material-symbols-outlined:hover {
+    color: var(--on-surface);
+  }
 
-    .result.visible { display: block; }
+  .field-hint {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--outline-variant);
+    line-height: 1.6;
+  }
 
-    .result h3 {
-      font-size: 0.85rem;
-      color: #6ee7b7;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.75rem;
-    }
+  /* Divider via tonal shift — no borders */
+  .section-divider {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(68, 71, 72, 0.15);
+  }
 
-    .result .url-box {
-      background: #0a0a0f;
-      border: 1px solid #2a2a40;
-      border-radius: 6px;
-      padding: 0.75rem;
-      font-family: 'SF Mono', Monaco, monospace;
-      font-size: 0.8rem;
-      word-break: break-all;
-      color: #a78bfa;
-      margin-bottom: 0.75rem;
-    }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+  }
 
-    .result .actions {
-      display: flex;
-      gap: 0.75rem;
-    }
+  .section-header .section-label {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+  }
 
-    .result .actions button {
-      flex: 1;
-      padding: 0.6rem;
-      border-radius: 6px;
-      border: 1px solid #2a2a40;
-      background: #141420;
-      color: #e0e0e0;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+  .section-header .section-title {
+    font-family: var(--font-headline);
+    font-size: 1.5rem;
+    font-style: italic;
+  }
 
-    .result .actions button:hover { background: #1e1e30; }
+  .section-header .status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(225, 193, 152, 0.4);
+  }
 
-    .result .actions .install-btn {
-      background: linear-gradient(135deg, #7c3aed, #3b82f6);
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
+  .status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: pulse 2s infinite;
+  }
 
-    .error {
-      color: #ef4444;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
-      display: none;
-    }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
 
-    .footer {
-      text-align: center;
-      margin-top: 2rem;
-      color: #444;
-      font-size: 0.8rem;
-    }
-  </style>
+  /* ─── Backend cards (bento grid) ─────────────────────────────────────── */
+  .backend-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .backend-card {
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem;
+    background: var(--surface-container-low);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.4s;
+  }
+
+  .backend-card:hover {
+    background: var(--surface-container);
+    border-color: rgba(68, 71, 72, 0.3);
+  }
+
+  .backend-card.active {
+    background: var(--surface-container);
+    border-color: rgba(225, 193, 152, 0.2);
+  }
+
+  .backend-card .card-icon {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .backend-card .card-icon .material-symbols-outlined {
+    color: var(--outline);
+    transition: color 0.3s;
+  }
+
+  .backend-card.active .card-icon .material-symbols-outlined {
+    color: var(--primary);
+  }
+
+  .active-badge {
+    display: none;
+    font-size: 0.55rem;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid rgba(225, 193, 152, 0.3);
+    color: var(--primary);
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  .backend-card.active .active-badge {
+    display: inline-block;
+  }
+
+  .backend-card h3 {
+    font-family: var(--font-headline);
+    font-size: 1.15rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .backend-card p {
+    font-size: 0.75rem;
+    color: var(--outline);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .backend-card .bg-number {
+    position: absolute;
+    right: -0.25rem;
+    bottom: -0.5rem;
+    font-family: var(--font-headline);
+    font-size: 3.5rem;
+    color: var(--surface-container-highest);
+    opacity: 0.1;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+
+  .backend-card:hover .bg-number,
+  .backend-card.active .bg-number { opacity: 0.2; }
+
+  /* ─── Right column — cinematic aside ─────────────────────────────────── */
+  .aside-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .hero-image {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    background: var(--surface-container-lowest);
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+    filter: grayscale(1) brightness(0.75);
+    transition: transform 1s ease;
+  }
+
+  .hero-image:hover img {
+    transform: scale(1.05);
+  }
+
+  /* Inner vignette */
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-image .image-caption {
+    position: absolute;
+    bottom: 2rem;
+    left: 2rem;
+    right: 2rem;
+    z-index: 2;
+  }
+
+  .hero-image .image-caption .divider {
+    width: 3rem;
+    height: 1px;
+    background: var(--primary);
+    margin-bottom: 1rem;
+  }
+
+  .hero-image .image-caption blockquote {
+    font-family: var(--font-headline);
+    font-size: 1.4rem;
+    line-height: 1.3;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-image .image-caption .credit {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--outline);
+  }
+
+  /* Stats panel */
+  .stats-panel {
+    padding: 2rem;
+    background: var(--surface-container-low);
+    border-radius: var(--radius-sm);
+  }
+
+  .stats-panel h4 {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--outline);
+    margin-bottom: 1.5rem;
+  }
+
+  .stats-panel .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.5rem 0;
+  }
+
+  .stat-row .stat-label { color: var(--outline); }
+  .stat-row .stat-value { color: var(--on-surface); }
+  .stat-row .stat-value.accent { color: var(--primary); }
+
+  .progress-track {
+    width: 100%;
+    height: 2px;
+    background: var(--surface-container-highest);
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+    position: relative;
+  }
+
+  .progress-fill {
+    position: absolute;
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.8s ease;
+  }
+
+  /* ─── Result URL ─────────────────────────────────────────────────────── */
+  .result-panel {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 2rem;
+    background: var(--surface-container-lowest);
+    border-radius: var(--radius-sm);
+    animation: fadeIn 0.4s ease;
+  }
+
+  .result-panel.visible { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-panel h3 {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 1rem;
+  }
+
+  .url-box {
+    background: var(--surface);
+    border-bottom: 1px solid rgba(68, 71, 72, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.75rem;
+    word-break: break-all;
+    color: var(--primary);
+    margin-bottom: 1rem;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  /* ─── Buttons ────────────────────────────────────────────────────────── */
+  .actions-bar {
+    margin-top: 4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: var(--on-primary);
+    border: none;
+    padding: 1.25rem 3rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: filter 0.2s, transform 0.15s;
+  }
+
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary .material-symbols-outlined { font-size: 1rem; }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(68, 71, 72, 0.3);
+    color: var(--primary);
+    padding: 1.25rem 3rem;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: background 0.3s;
+  }
+
+  .btn-secondary:hover { background: var(--surface-container); }
+
+  .btn-secondary .material-symbols-outlined { font-size: 1rem; }
+
+  /* Error */
+  .error-msg {
+    display: none;
+    color: var(--error);
+    font-size: 0.8rem;
+    margin-top: 0.75rem;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* ─── Footer ─────────────────────────────────────────────────────────── */
+  footer {
+    background: var(--surface-container-lowest);
+    font-family: var(--font-body);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 300;
+    padding: 3rem;
+    margin-top: auto;
+    border-top: 1px solid rgba(68, 71, 72, 0.15);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  footer .copyright { color: var(--outline); }
+
+  footer nav {
+    display: flex;
+    gap: 2.5rem;
+  }
+
+  footer nav a {
+    color: var(--outline);
+    text-decoration: none;
+    transition: color 0.4s;
+  }
+
+  footer nav a:hover { color: var(--primary); }
+
+  /* ─── Responsive ─────────────────────────────────────────────────────── */
+  @media (max-width: 48rem) {
+    header { padding: 0 1rem; }
+    header nav { display: none; }
+    main { padding: 6rem 1rem 4rem; }
+    .backend-grid { grid-template-columns: 1fr; }
+    .actions-bar { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+    footer { flex-direction: column; text-align: center; padding: 2rem 1rem; }
+    footer nav { justify-content: center; }
+    .hero-image { aspect-ratio: 16 / 9; }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>ReeL Wisper</h1>
-      <p>AI-powered movie & TV discovery for Stremio.<br>Describe what you want to watch. We'll find it.</p>
-    </div>
+<!-- ─── Header ──────────────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">ReeL <span>Wisper</span></div>
+  <nav>
+    <a href="https://github.com/clockworksquirrel/reel-wisper">GitHub</a>
+    <a href="https://www.stremio.com/">Get Stremio</a>
+  </nav>
+</header>
 
-    <div class="card">
-      <div class="field">
-        <label>Provider</label>
-        <select id="backend" onchange="updateFields()">
-          <option value="openai">OpenAI</option>
-          <option value="gemini">Google Gemini</option>
-          <option value="openrouter">OpenRouter</option>
-          <option value="custom">Custom (OpenAI-compatible)</option>
-        </select>
-      </div>
-
-      <div class="field" id="baseUrlField" style="display: none;">
-        <label>API Base URL</label>
-        <input type="url" id="baseUrl" value="https://api.openai.com/v1" placeholder="https://api.openai.com/v1">
-        <div class="hint">Any OpenAI-compatible API endpoint</div>
-      </div>
-
-      <div class="field">
-        <label>API Key</label>
-        <input type="password" id="apiKey" placeholder="sk-...">
-        <div class="hint" id="apiKeyHint">Get one at platform.openai.com/api-keys</div>
-      </div>
-
-      <div class="field">
-        <label>Model</label>
-        <select id="modelSelect" onchange="updateModel()">
-        </select>
-        <input type="text" id="modelCustom" style="display:none; margin-top: 0.5rem;" placeholder="Enter model ID">
-        <div class="hint" id="modelHint">Fast & cheap, great for search</div>
-      </div>
-
-      <button class="btn" onclick="generate()">Generate Addon URL</button>
-      <div class="error" id="error"></div>
-
-      <div class="result" id="result">
-        <h3>Your Addon URL</h3>
-        <div class="url-box" id="manifestUrl"></div>
-        <div class="actions">
-          <button onclick="copyUrl()">Copy URL</button>
-          <button class="install-btn" onclick="installAddon()">Install in Stremio</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer">
-      ReeL Wisper — Your API keys are encrypted in the URL and never stored on our servers.
-    </div>
+<!-- ─── Main ────────────────────────────────────────────────────────────── -->
+<main>
+  <!-- Hero -->
+  <div class="hero">
+    <p class="overline">Stremio &amp; Kodi Add-on</p>
+    <h1>REEL <em>WISPER</em></h1>
+    <p class="tagline">
+      Describe what you want to watch. AI finds it.
+      Natural language search for movies and TV — powered by your own API key.
+    </p>
   </div>
 
-  <script>
-    let currentManifestUrl = '';
-    let currentStremioUrl = '';
+  <div class="layout">
+    <!-- Left: Configuration -->
+    <section class="config-section">
+      <!-- Backend selector -->
+      <div>
+        <div class="section-header">
+          <div>
+            <p class="section-label">AI Backend</p>
+            <p class="section-title">Choose Your Engine</p>
+          </div>
+          <div class="status">
+            <div class="dot"></div>
+            Select Provider
+          </div>
+        </div>
 
-    const providers = {
-      openai: {
-        baseUrl: 'https://api.openai.com/v1',
-        keyHint: 'Get one at platform.openai.com/api-keys',
-        keyPlaceholder: 'sk-...',
-        models: [
-          { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Recommended)', hint: 'Fast & cheap, great for search' },
-          { id: 'gpt-4o', name: 'GPT-4o', hint: 'More capable, slightly slower' },
-          { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', hint: 'Latest mini model' },
-          { id: 'gpt-4.1-nano', name: 'GPT-4.1 Nano', hint: 'Fastest, cheapest' },
-          { id: 'custom', name: 'Custom...', hint: 'Enter any model ID' },
-        ],
-      },
-      gemini: {
-        baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
-        keyHint: 'Get one at aistudio.google.com/apikey (free tier available)',
-        keyPlaceholder: 'AIza...',
-        models: [
-          { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash (Recommended)', hint: 'Fast, free tier available' },
-          { id: 'gemini-2.5-flash-preview-04-17', name: 'Gemini 2.5 Flash', hint: 'Latest flash model' },
-          { id: 'gemini-2.5-pro-preview-03-25', name: 'Gemini 2.5 Pro', hint: 'Most capable' },
-          { id: 'custom', name: 'Custom...', hint: 'Enter any model ID' },
-        ],
-      },
-      openrouter: {
-        baseUrl: 'https://openrouter.ai/api/v1',
-        keyHint: 'Get one at openrouter.ai/keys',
-        keyPlaceholder: 'sk-or-...',
-        models: [
-          { id: 'google/gemini-2.0-flash-001', name: 'Gemini 2.0 Flash (Recommended)', hint: 'Free on OpenRouter' },
-          { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini', hint: 'Fast & cheap' },
-          { id: 'anthropic/claude-3.5-haiku', name: 'Claude 3.5 Haiku', hint: 'Fast Anthropic model' },
-          { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B', hint: 'Free on OpenRouter' },
-          { id: 'custom', name: 'Custom...', hint: 'Enter any model ID' },
-        ],
-      },
-      custom: {
-        baseUrl: '',
-        keyHint: 'Your API key or auth token',
-        keyPlaceholder: 'your-api-key',
-        models: [
-          { id: 'custom', name: 'Custom...', hint: 'Enter the model ID your backend supports' },
-        ],
-      },
+        <div class="backend-grid">
+          <div class="backend-card active" data-backend="gemini" onclick="selectBackend('gemini')">
+            <div class="bg-number">01</div>
+            <div class="card-icon">
+              <span class="material-symbols-outlined">auto_awesome</span>
+              <span class="active-badge">Active</span>
+            </div>
+            <h3>Gemini</h3>
+            <p>Google's fastest model. Free tier available — perfect for getting started.</p>
+          </div>
+
+          <div class="backend-card" data-backend="openai" onclick="selectBackend('openai')">
+            <div class="bg-number">02</div>
+            <div class="card-icon">
+              <span class="material-symbols-outlined">psychology</span>
+              <span class="active-badge">Active</span>
+            </div>
+            <h3>OpenAI</h3>
+            <p>GPT-4o, GPT-4o-mini, and the full OpenAI model lineup.</p>
+          </div>
+
+          <div class="backend-card" data-backend="custom" onclick="selectBackend('custom')">
+            <div class="bg-number">03</div>
+            <div class="card-icon">
+              <span class="material-symbols-outlined">tune</span>
+              <span class="active-badge">Active</span>
+            </div>
+            <h3>Custom</h3>
+            <p>Any OpenAI-compatible endpoint — OpenRouter, Ollama, LM Studio, etc.</p>
+          </div>
+
+          <div class="backend-card placeholder" style="cursor: default; opacity: 0.4;">
+            <div style="text-align: center; padding: 1rem 0;">
+              <div style="width: 2rem; height: 1px; background: rgba(68,71,72,0.5); margin: 0 auto 0.75rem;"></div>
+              <p style="font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--outline-variant);">More coming...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Key -->
+      <div class="field-group">
+        <label>API Key</label>
+        <div class="input-wrapper">
+          <input type="password" id="apiKey" placeholder="••••••••••••••••••••••••••••••"/>
+          <div class="trailing-icon">
+            <span class="material-symbols-outlined" onclick="togglePassword()" id="visIcon">visibility</span>
+            <span class="material-symbols-outlined" onclick="openKeyPage()" title="Get API key" id="keyIcon">key</span>
+          </div>
+        </div>
+        <p class="field-hint">Your key stays on your device. Encrypted in transit, never stored on our servers.</p>
+      </div>
+
+      <!-- Base URL (hidden by default, shown for custom) -->
+      <div class="field-group" id="baseUrlField" style="display: none;">
+        <label>API Base URL</label>
+        <div class="input-wrapper">
+          <input type="url" id="baseUrl" value="" placeholder="https://api.example.com/v1"/>
+        </div>
+        <p class="field-hint" id="baseUrlHint">Any OpenAI-compatible endpoint</p>
+      </div>
+
+      <!-- Model -->
+      <div class="field-group">
+        <label>Model</label>
+        <div class="input-wrapper">
+          <input type="text" id="model" value="gemini-3.1-flash-lite-preview" placeholder="gemini-3.1-flash-lite-preview"/>
+        </div>
+        <p class="field-hint" id="modelHint">Gemini 3.1 Flash Lite — fast, free, and accurate</p>
+      </div>
+
+      <!-- Error -->
+      <div class="error-msg" id="error"></div>
+
+      <!-- Result panel -->
+      <div class="result-panel" id="result">
+        <h3>Your Add-on URL</h3>
+        <div class="url-box" id="manifestUrl"></div>
+        <div class="result-actions">
+          <button class="btn-primary" onclick="installAddon()">
+            Install in Stremio
+            <span class="material-symbols-outlined">download</span>
+          </button>
+          <button class="btn-secondary" onclick="copyUrl()">
+            Copy URL
+            <span class="material-symbols-outlined">content_copy</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Cinematic aside -->
+    <aside class="aside-section">
+      <div class="hero-image">
+        <img
+          src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=80"
+          alt="Dark cinema interior with warm projector glow"
+          loading="lazy"
+        />
+        <div class="image-caption">
+          <div class="divider"></div>
+          <blockquote>"Show me something dark and atmospheric, like Blade Runner but more noir."</blockquote>
+          <p class="credit">Example query // Natural language search</p>
+        </div>
+      </div>
+
+      <div class="stats-panel">
+        <h4>How It Works</h4>
+        <div class="stat-row">
+          <span class="stat-label">You describe</span>
+          <span class="stat-value accent">Natural language</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: 100%;"></div>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">AI matches</span>
+          <span class="stat-value">TMDB + TVDB</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Results appear</span>
+          <span class="stat-value">In Stremio / Kodi</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Actions bar -->
+  <div class="actions-bar">
+    <button class="btn-primary" onclick="generate()">
+      Generate Add-on URL
+      <span class="material-symbols-outlined">play_arrow</span>
+    </button>
+    <button class="btn-secondary" onclick="resetForm()">
+      Reset
+      <span class="material-symbols-outlined">refresh</span>
+    </button>
+  </div>
+</main>
+
+<!-- ─── Footer ──────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="copyright">© 2026 ReeL Wisper. Your keys, your data, your movies.</div>
+  <nav>
+    <a href="https://github.com/clockworksquirrel/reel-wisper">Source</a>
+    <a href="https://www.stremio.com/">Stremio</a>
+    <a href="https://kodi.tv/">Kodi</a>
+  </nav>
+</footer>
+
+<script>
+  /* ─── State ──────────────────────────────────────────────────────────── */
+  let currentBackend = 'gemini';
+  let currentManifestUrl = '';
+  let currentStremioUrl = '';
+
+  const presets = {
+    gemini: {
+      baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
+      model: 'gemini-3.1-flash-lite-preview',
+      placeholder: 'AIzaSy...',
+      baseUrlHint: 'Google AI Studio endpoint',
+      modelHint: 'Gemini 3.1 Flash Lite — fast, free, and accurate',
+      showBaseUrl: false,
+      keyUrl: 'https://aistudio.google.com/apikey',
+    },
+    openai: {
+      baseUrl: 'https://api.openai.com/v1',
+      model: 'gpt-4o-mini',
+      placeholder: 'sk-...',
+      baseUrlHint: 'OpenAI API endpoint',
+      modelHint: 'Any OpenAI model — gpt-4o, gpt-4o-mini, o4-mini, etc.',
+      showBaseUrl: false,
+      keyUrl: 'https://platform.openai.com/api-keys',
+    },
+    custom: {
+      baseUrl: '',
+      model: '',
+      placeholder: 'Your API key or auth token',
+      baseUrlHint: 'Any OpenAI-compatible endpoint (OpenRouter, Ollama, etc.)',
+      modelHint: 'Any model your backend supports',
+      showBaseUrl: true,
+      keyUrl: null,
+    },
+  };
+
+  /* ─── Backend selection ──────────────────────────────────────────────── */
+  function selectBackend(backend) {
+    currentBackend = backend;
+    const p = presets[backend];
+
+    // Update cards
+    document.querySelectorAll('.backend-card[data-backend]').forEach(card => {
+      card.classList.toggle('active', card.dataset.backend === backend);
+    });
+
+    // Update fields
+    document.getElementById('baseUrl').value = p.baseUrl;
+    document.getElementById('model').value = p.model;
+    document.getElementById('apiKey').placeholder = p.placeholder;
+    document.getElementById('baseUrlHint').textContent = p.baseUrlHint;
+    document.getElementById('modelHint').textContent = p.modelHint;
+    document.getElementById('baseUrlField').style.display = p.showBaseUrl ? '' : 'none';
+
+    // Update key icon state
+    const keyIcon = document.getElementById('keyIcon');
+    if (p.keyUrl) {
+      keyIcon.style.opacity = '1';
+      keyIcon.style.cursor = 'pointer';
+      keyIcon.title = 'Get API key';
+    } else {
+      keyIcon.style.opacity = '0.3';
+      keyIcon.style.cursor = 'default';
+      keyIcon.title = '';
+    }
+  }
+
+  /* ─── Password toggle ───────────────────────────────────────────────── */
+  function togglePassword() {
+    const input = document.getElementById('apiKey');
+    const icon = document.getElementById('visIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.textContent = 'visibility_off';
+    } else {
+      input.type = 'password';
+      icon.textContent = 'visibility';
+    }
+  }
+
+  /* ─── Generate URL ───────────────────────────────────────────────────── */
+  async function generate() {
+    const errorEl = document.getElementById('error');
+    const resultEl = document.getElementById('result');
+    errorEl.classList.remove('visible');
+    resultEl.classList.remove('visible');
+
+    const apiKey = document.getElementById('apiKey').value.trim();
+    if (!apiKey) {
+      errorEl.textContent = 'API key is required.';
+      errorEl.classList.add('visible');
+      return;
+    }
+
+    const body = {
+      backend: currentBackend,
+      apiKey,
+      baseUrl: document.getElementById('baseUrl').value.trim() || presets[currentBackend].baseUrl,
+      model: document.getElementById('model').value.trim(),
     };
 
-    function updateFields() {
-      const backend = document.getElementById('backend').value;
-      const provider = providers[backend];
-      const baseUrlField = document.getElementById('baseUrlField');
-      const baseUrlInput = document.getElementById('baseUrl');
+    try {
+      const res = await fetch('/configure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
 
-      // Show base URL field only for custom
-      baseUrlField.style.display = backend === 'custom' ? 'block' : 'none';
-      baseUrlInput.value = provider.baseUrl;
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
 
-      // Update key hint
-      document.getElementById('apiKeyHint').textContent = provider.keyHint;
-      document.getElementById('apiKey').placeholder = provider.keyPlaceholder;
-
-      // Update model dropdown
-      const modelSelect = document.getElementById('modelSelect');
-      modelSelect.innerHTML = '';
-      for (const m of provider.models) {
-        const opt = document.createElement('option');
-        opt.value = m.id;
-        opt.textContent = m.name;
-        modelSelect.appendChild(opt);
-      }
-
-      updateModel();
+      currentManifestUrl = data.manifestUrl;
+      currentStremioUrl = data.stremioUrl;
+      document.getElementById('manifestUrl').textContent = currentManifestUrl;
+      resultEl.classList.add('visible');
+    } catch (e) {
+      errorEl.textContent = e.message;
+      errorEl.classList.add('visible');
     }
+  }
 
-    function updateModel() {
-      const modelSelect = document.getElementById('modelSelect');
-      const modelCustom = document.getElementById('modelCustom');
-      const backend = document.getElementById('backend').value;
-      const provider = providers[backend];
+  /* ─── Clipboard ──────────────────────────────────────────────────────── */
+  function copyUrl() {
+    navigator.clipboard.writeText(currentManifestUrl).then(() => {
+      const btn = event.target.closest('button');
+      const orig = btn.innerHTML;
+      btn.innerHTML = 'Copied <span class="material-symbols-outlined">check</span>';
+      setTimeout(() => { btn.innerHTML = orig; }, 2000);
+    });
+  }
 
-      if (modelSelect.value === 'custom') {
-        modelCustom.style.display = 'block';
-      } else {
-        modelCustom.style.display = 'none';
-      }
-
-      const selected = provider.models.find(m => m.id === modelSelect.value);
-      document.getElementById('modelHint').textContent = selected?.hint || '';
-    }
-
-    function getModel() {
-      const modelSelect = document.getElementById('modelSelect');
-      if (modelSelect.value === 'custom') {
-        return document.getElementById('modelCustom').value.trim();
-      }
-      return modelSelect.value;
-    }
-
-    async function generate() {
-      const errorEl = document.getElementById('error');
-      const resultEl = document.getElementById('result');
-      errorEl.style.display = 'none';
-      resultEl.classList.remove('visible');
-
-      const apiKey = document.getElementById('apiKey').value.trim();
-      if (!apiKey) {
-        errorEl.textContent = 'API key is required';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      const model = getModel();
-      if (!model) {
-        errorEl.textContent = 'Please enter a model name';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      const backend = document.getElementById('backend').value;
-      const baseUrl = backend === 'custom'
-        ? document.getElementById('baseUrl').value.trim()
-        : providers[backend].baseUrl;
-
-      const body = { backend, apiKey, baseUrl, model };
-
-      try {
-        const res = await fetch('/configure', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-
-        const data = await res.json();
-        if (data.error) throw new Error(data.error);
-
-        currentManifestUrl = data.manifestUrl;
-        currentStremioUrl = data.stremioUrl;
-        document.getElementById('manifestUrl').textContent = currentManifestUrl;
-        resultEl.classList.add('visible');
-      } catch (e) {
-        errorEl.textContent = e.message;
-        errorEl.style.display = 'block';
-      }
-    }
-
-    function copyUrl() {
-      navigator.clipboard.writeText(currentManifestUrl);
-    }
-
-    function installAddon() {
+  /* ─── Install ────────────────────────────────────────────────────────── */
+  function installAddon() {
+    if (currentStremioUrl) {
       window.location.href = currentStremioUrl;
     }
+  }
 
-    // Initialize on load
-    updateFields();
-  </script>
+  /* ─── Get API Key ─────────────────────────────────────────────────────── */
+  function openKeyPage() {
+    const url = presets[currentBackend].keyUrl;
+    if (url) {
+      window.open(url, '_blank', 'noopener');
+    }
+  }
+
+  /* ─── Reset ──────────────────────────────────────────────────────────── */
+  function resetForm() {
+    selectBackend('gemini');
+    document.getElementById('apiKey').value = '';
+    document.getElementById('result').classList.remove('visible');
+    document.getElementById('error').classList.remove('visible');
+  }
+</script>
 </body>
 </html>
